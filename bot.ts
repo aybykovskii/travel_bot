@@ -84,8 +84,6 @@ bot
     try {
       const member = await ctx.telegram.getChatMember(process.env.CHAT_ID!, ctx.from.id)
 
-      console.log(member)
-
       if (['creator', 'administrator', 'member'].includes(member.status)) {        
         ctx.reply(`Спасибо за подписку! В канале тебя ждет много всего интересного из самых разных уголков света!🌍\n\nЛови планер для твоих будущих путешествий. Надеюсь, он поможет тебе при планировании 💗✨`)
 
@@ -104,9 +102,10 @@ bot
 process.once('SIGINT', () => bot.stop('SIGINT'))
 process.once('SIGTERM', () => bot.stop('SIGTERM'))
 
-app.use(express.json())
-app.listen(3000, () => {
-  console.log('Bot started on port 3000')
+const PORT = process.env.PORT || 3030
+
+app.listen(PORT, () => {
+  console.log(`Bot started on port ${PORT}`)
   
   mongoose
 	.connect(process.env.MONGODB_URL!)
