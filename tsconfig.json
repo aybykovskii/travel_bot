@@ -1,0 +1,21 @@
+{
+	"compilerOptions": {
+		"target": "esnext",
+		"module": "esnext",
+		"baseUrl": "./",
+		"resolveJsonModule": true,
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"strict": true,
+		"noImplicitAny": true,
+		"skipDefaultLibCheck": true,
+		"skipLibCheck": true,
+		"noEmit": true,
+		"moduleResolution": "bundler",
+		"isolatedModules": true,
+		"jsx": "preserve",
+		"incremental": true,
+	},
+	"include": [ "./**/*.ts", ],
+	"exclude": ["node_modules"]
+}
