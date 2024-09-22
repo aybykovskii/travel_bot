@@ -3,6 +3,7 @@ import mongoose, { model, Schema } from 'mongoose'
 import fs from 'node:fs'
 import path from 'node:path'
 import { Telegraf } from 'telegraf'
+import { fmt, link, quote } from 'telegraf/format'
 
 const app = express()
 const bot = new Telegraf(process.env.BOT_TOKEN!)
@@ -66,7 +67,7 @@ bot
   }
 
   const timeout = setTimeout(() => {
-    ctx.reply('Удалось посмотреть планер? Напиши свое мнение в ответ на это сообщение')
+    ctx.reply(`Ну как тебе гайд? Уже посмотрел(а)?\n\nНапиши, что в гайде оказалось для тебя полезнее всего! Стало ли понятнее, как планировать самостоятельные путешествия? 🌍 \n\nДля меня очень важна твоя обратная связь💗`)
     timeouts.delete(ctx.chat.id)
   }, 1000 * 60 * 60)
 
@@ -77,9 +78,11 @@ bot
   const { message } = ctx
 
   if (message && 'text' in message && message.text.trim().toLowerCase() === 'планирование') {
-    ctx.reply('Твой тревел-планер тебя уже заждался! 💗\n\nДля получения планера подпишись на телеграм-канал Путеводитель Мечтателя https://t.me/thedreamersguide 🗺✨\n\nИ затем напиши сюда слово "готово"')
-  }
+    ctx.reply(fmt`Твой тревел-планер тебя уже заждался! 💗\n\nДля получения планера подпишись на телеграм-канал ${link('Путеводитель Мечтателя', 'https://t.me/thedreamersguide')} 🗺✨\n\nИ затем напиши сюда слово "готово"`)
 
+    return
+  }
+  
   if (message && 'text' in message && message.text.trim().toLowerCase() === 'готово') {
     try {
       const member = await ctx.telegram.getChatMember(process.env.CHAT_ID!, ctx.from.id)
@@ -95,12 +98,23 @@ bot
       console.error(e)
       ctx.reply('Упс! Не получилось. Давай попробуем еще раз. Подпишись на телеграм-канал и напиши слово "готово"☺️')
     }
+
+    return
+  }
+
+  if ('text' in message && message.text.trim().length) {
+    const pre = `📝 Отзыв от @${message.from?.username ?? '_unknown_'}\n`
+
+    ctx.telegram.sendMessage(
+      process.env.USER_ID!,
+      fmt`📝 Отзыв от @${message.from?.username ?? '_unknown_'}\n${quote`${message.text}`}`
+    )
+
+    ctx.reply(
+      fmt`Спасибо за обратную связь! 😍\n\nЯ уже работаю над новым полезным гайдом. Следи за обновлениями в моем Instagram ${link('@daaspil', 'https://www.instagram.com/daaspil')}, давай путешествовать вместе! 🌍`
+    )
   }
 })
-
-
-process.once('SIGINT', () => bot.stop('SIGINT'))
-process.once('SIGTERM', () => bot.stop('SIGTERM'))
 
 const PORT = process.env.PORT || 3030
 
@@ -117,4 +131,7 @@ app.listen(PORT, () => {
 	})
 
   bot.launch()
+
+  process.once('SIGINT', () => bot.stop('SIGINT'))
+  process.once('SIGTERM', () => bot.stop('SIGTERM'))
 })
